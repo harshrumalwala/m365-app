@@ -1,26 +1,27 @@
-import React from 'react';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
-import ReactDOM from 'react-dom';
+import React from "react";
+import "./index.css";
+import App from "./App";
+import reportWebVitals from "./reportWebVitals";
+import ReactDOM from "react-dom";
 
 import {
   PublicClientApplication,
   EventType,
   EventMessage,
-  AuthenticationResult } from '@azure/msal-browser';
+  AuthenticationResult,
+} from "@azure/msal-browser";
 
-import config from './Config';
+import config from "./Config";
 
 const msalInstance = new PublicClientApplication({
   auth: {
     clientId: config.appId,
-    redirectUri: config.redirectUri
+    redirectUri: config.redirectUri,
   },
   cache: {
-    cacheLocation: 'sessionStorage',
-    storeAuthStateInCookie: true
-  }
+    cacheLocation: "sessionStorage",
+    storeAuthStateInCookie: true,
+  },
 });
 
 // Check if there are already accounts in the browser session
@@ -40,9 +41,9 @@ msalInstance.addEventCallback((event: EventMessage) => {
 
 ReactDOM.render(
   <React.StrictMode>
-    <App pca = { msalInstance }/>
+    <App pca={msalInstance} />
   </React.StrictMode>,
-  document.getElementById('root')
+  document.getElementById("root")
 );
 
 // If you want to start measuring performance in your app, pass a function

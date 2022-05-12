@@ -3,26 +3,27 @@ import React, {
   createContext,
   useState,
   MouseEventHandler,
-  useEffect} from 'react';
+  useEffect,
+} from "react";
 
-import { InteractionType, PublicClientApplication } from '@azure/msal-browser';
-import { useMsal } from '@azure/msal-react';
-import config from './Config';
-import { getUser } from './GraphService';
-import { AuthCodeMSALBrowserAuthenticationProvider } from '@microsoft/microsoft-graph-client/authProviders/authCodeMsalBrowser';
+import { InteractionType, PublicClientApplication } from "@azure/msal-browser";
+import { useMsal } from "@azure/msal-react";
+import config from "./Config";
+import { getUser } from "./GraphService";
+import { AuthCodeMSALBrowserAuthenticationProvider } from "@microsoft/microsoft-graph-client/authProviders/authCodeMsalBrowser";
 
 export interface AppUser {
-  displayName?: string,
-  email?: string,
-  avatar?: string,
-  timeZone?: string,
-  timeFormat?: string
-};
+  displayName?: string;
+  email?: string;
+  avatar?: string;
+  timeZone?: string;
+  timeFormat?: string;
+}
 
 export interface AppError {
-  message: string,
-  debug?: string
-};
+  message: string;
+  debug?: string;
+}
 
 type AppContext = {
   user?: AppUser;
@@ -32,7 +33,7 @@ type AppContext = {
   displayError?: Function;
   clearError?: Function;
   authProvider?: AuthCodeMSALBrowserAuthenticationProvider;
-}
+};
 
 const appContext = createContext<AppContext>({
   user: undefined,
@@ -41,7 +42,7 @@ const appContext = createContext<AppContext>({
   signOut: undefined,
   displayError: undefined,
   clearError: undefined,
-  authProvider: undefined
+  authProvider: undefined,
 });
 
 export function useAppContext(): AppContext {
@@ -52,13 +53,11 @@ interface ProvideAppContextProps {
   children: React.ReactNode;
 }
 
-export default function ProvideAppContext({ children }: ProvideAppContextProps) {
+export default function ProvideAppContext({
+  children,
+}: ProvideAppContextProps) {
   const auth = useProvideAppContext();
-  return (
-    <appContext.Provider value={auth}>
-      {children}
-    </appContext.Provider>
-  );
+  return <appContext.Provider value={auth}>{children}</appContext.Provider>;
 }
 
 function useProvideAppContext() {
@@ -67,7 +66,7 @@ function useProvideAppContext() {
   const [error, setError] = useState<AppError | undefined>(undefined);
 
   useEffect(() => {
-    const checkUser = async() => {
+    const checkUser = async () => {
       if (!user) {
         try {
           // Check if user is already signed in
@@ -75,12 +74,12 @@ function useProvideAppContext() {
           if (account) {
             // Get the user from Microsoft Graph
             const user = await getUser(authProvider);
-  
+
             setUser({
-              displayName: user.displayName || '',
-              email: user.mail || user.userPrincipalName || '',
-              timeFormat: user.mailboxSettings?.timeFormat || 'h:mm a',
-              timeZone: user.mailboxSettings?.timeZone || 'UTC'
+              displayName: user.displayName || "",
+              email: user.mail || user.userPrincipalName || "",
+              timeFormat: user.mailboxSettings?.timeFormat || "h:mm a",
+              timeZone: user.mailboxSettings?.timeZone || "UTC",
             });
           }
         } catch (err: any) {
@@ -92,12 +91,12 @@ function useProvideAppContext() {
   });
 
   const displayError = (message: string, debug?: string) => {
-    setError({message, debug});
-  }
+    setError({ message, debug });
+  };
 
   const clearError = () => {
     setError(undefined);
-  }
+  };
 
   // Used by the Graph SDK to authenticate API calls
   const authProvider = new AuthCodeMSALBrowserAuthenticationProvider(
@@ -105,24 +104,24 @@ function useProvideAppContext() {
     {
       account: msal.instance.getActiveAccount()!,
       scopes: config.scopes,
-      interactionType: InteractionType.Popup
+      interactionType: InteractionType.Popup,
     }
   );
 
   const signIn = async () => {
     await msal.instance.loginPopup({
       scopes: config.scopes,
-      prompt: 'select_account'
+      prompt: "select_account",
     });
-  
+
     // Get the user from Microsoft Graph
     const user = await getUser(authProvider);
-  
+
     setUser({
-      displayName: user.displayName || '',
-      email: user.mail || user.userPrincipalName || '',
-      timeFormat: user.mailboxSettings?.timeFormat || '',
-      timeZone: user.mailboxSettings?.timeZone || 'UTC'
+      displayName: user.displayName || "",
+      email: user.mail || user.userPrincipalName || "",
+      timeFormat: user.mailboxSettings?.timeFormat || "",
+      timeZone: user.mailboxSettings?.timeZone || "UTC",
     });
   };
 
@@ -138,6 +137,6 @@ function useProvideAppContext() {
     signOut,
     displayError,
     clearError,
-    authProvider
+    authProvider,
   };
 }
