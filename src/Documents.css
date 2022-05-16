@@ -1,0 +1,8 @@
+.select-item {
+  padding: 5px
+}
+
+.select-item:hover {
+  background-color: aliceblue;
+  cursor: pointer;
+}

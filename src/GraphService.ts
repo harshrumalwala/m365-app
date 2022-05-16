@@ -104,3 +104,20 @@ export async function createEvent(
   // request body
   return await graphClient!.api("/me/events").post(newEvent);
 }
+
+export async function searchDocs(
+  authProvider: AuthCodeMSALBrowserAuthenticationProvider,
+  query: string
+): Promise<any> {
+  ensureClient(authProvider);
+
+  // Return the /me API endpoint result as a User object
+  const matchedDocs = await graphClient!
+    .api(
+      `/sites/harshashvingmail.sharepoint.com,eede2fd0-68f0-4988-ba4f-b048cf226b1e,c031d987-e061-4b55-a997-83807c7aa95f/drive/root/search(q='${query}')`
+    )
+    // Only retrieve the specific fields needed
+    .get();
+
+  return matchedDocs.value;
+}

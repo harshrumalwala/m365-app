@@ -86,7 +86,7 @@ export default function NewEvent(props: RouteComponentProps) {
           id="subject"
           className="mb-2"
           value={subject}
-          onChange={(ev) => setSubject(ev.target.value)}
+          onChange={(ev: any) => setSubject(ev.target.value)}
         />
       </Form.Group>
       <Form.Group>
@@ -98,7 +98,7 @@ export default function NewEvent(props: RouteComponentProps) {
           className="mb-2"
           placeholder="Enter a list of email addresses, seperated by a semi-colon"
           value={attendees}
-          onChange={(ev) => setAttendees(ev.target.value)}
+          onChange={(ev: any) => setAttendees(ev.target.value)}
         />
       </Form.Group>
       <Row className="mb-2">
@@ -110,7 +110,7 @@ export default function NewEvent(props: RouteComponentProps) {
               name="start"
               id="start"
               value={start}
-              onChange={(ev) => setStart(ev.target.value)}
+              onChange={(ev: any) => setStart(ev.target.value)}
             />
           </Form.Group>
         </Col>
@@ -122,7 +122,7 @@ export default function NewEvent(props: RouteComponentProps) {
               name="end"
               id="end"
               value={end}
-              onChange={(ev) => setEnd(ev.target.value)}
+              onChange={(ev: any) => setEnd(ev.target.value)}
             />
           </Form.Group>
         </Col>
@@ -136,7 +136,7 @@ export default function NewEvent(props: RouteComponentProps) {
           className="mb-3"
           style={{ height: "10em" }}
           value={body}
-          onChange={(ev) => setBody(ev.target.value)}
+          onChange={(ev: any) => setBody(ev.target.value)}
         />
       </Form.Group>
       <Button

@@ -10,6 +10,7 @@ import Welcome from "./Welcome";
 import "bootstrap/dist/css/bootstrap.css";
 import Calendar from "./Calendar";
 import NewEvent from "./NewEvent";
+import Documents from "./Documents";
 
 type AppProps = {
   pca: IPublicClientApplication;
@@ -38,6 +39,11 @@ export default function App({ pca }: AppProps) {
                 exact
                 path="/newevent"
                 render={(props) => <NewEvent {...props} />}
+              />
+              <Route
+                exact
+                path="/docs"
+                render={(props) => <Documents {...props} />}
               />
             </Container>
           </div>
