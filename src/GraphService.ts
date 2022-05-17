@@ -121,3 +121,12 @@ export async function searchDocs(
 
   return matchedDocs.value;
 }
+
+export async function uploadDocument(filename: string, fileToUpload: any) {
+  const uploadURL =
+    "/sites/harshashvingmail.sharepoint.com,eede2fd0-68f0-4988-ba4f-b048cf226b1e,c031d987-e061-4b55-a997-83807c7aa95f/drive/root:/" +
+    filename +
+    ":/content";
+  const response = await graphClient!.api(uploadURL).put(fileToUpload);
+  return response;
+}

@@ -6,3 +6,7 @@
   background-color: aliceblue;
   cursor: pointer;
 }
+
+.upload-container {
+  padding-top: 35px;
+}
