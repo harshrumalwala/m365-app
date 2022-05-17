@@ -111,12 +111,10 @@ export async function searchDocs(
 ): Promise<any> {
   ensureClient(authProvider);
 
-  // Return the /me API endpoint result as a User object
   const matchedDocs = await graphClient!
     .api(
       `/sites/harshashvingmail.sharepoint.com,eede2fd0-68f0-4988-ba4f-b048cf226b1e,c031d987-e061-4b55-a997-83807c7aa95f/drive/root/search(q='${query}')`
     )
-    // Only retrieve the specific fields needed
     .get();
 
   return matchedDocs.value;
@@ -128,15 +126,28 @@ export async function getDoc(
 ): Promise<any> {
   ensureClient(authProvider);
 
-  // Return the /me API endpoint result as a User object
   const matchedDoc = await graphClient!
     .api(
       `/sites/harshashvingmail.sharepoint.com,eede2fd0-68f0-4988-ba4f-b048cf226b1e,c031d987-e061-4b55-a997-83807c7aa95f/drive/items/${id}`
     )
-    // Only retrieve the specific fields needed
     .get();
 
   return matchedDoc;
+}
+
+export async function getDocVersions(
+  authProvider: AuthCodeMSALBrowserAuthenticationProvider,
+  id: string
+): Promise<any> {
+  ensureClient(authProvider);
+
+  const docVersions = await graphClient!
+    .api(
+      `/sites/harshashvingmail.sharepoint.com,eede2fd0-68f0-4988-ba4f-b048cf226b1e,c031d987-e061-4b55-a997-83807c7aa95f/drive/items/${id}/versions`
+    )
+    .get();
+
+  return docVersions.value;
 }
 
 export async function uploadDocument(
@@ -151,4 +162,33 @@ export async function uploadDocument(
     ":/content";
   const response = await graphClient!.api(uploadURL).put(fileToUpload);
   return response;
+}
+
+export async function updateDoc(
+  authProvider: AuthCodeMSALBrowserAuthenticationProvider,
+  id: string,
+  body: any
+): Promise<any> {
+  ensureClient(authProvider);
+  const updatedDoc = await graphClient!
+    .api(
+      `/sites/harshashvingmail.sharepoint.com,eede2fd0-68f0-4988-ba4f-b048cf226b1e,c031d987-e061-4b55-a997-83807c7aa95f/drive/items/${id}`
+    )
+    .update(body);
+
+  return updatedDoc;
+}
+
+export async function deleteDoc(
+  authProvider: AuthCodeMSALBrowserAuthenticationProvider,
+  id: string
+): Promise<any> {
+  ensureClient(authProvider);
+  const deletedDoc = await graphClient!
+    .api(
+      `/sites/harshashvingmail.sharepoint.com,eede2fd0-68f0-4988-ba4f-b048cf226b1e,c031d987-e061-4b55-a997-83807c7aa95f/drive/items/${id}`
+    )
+    .delete();
+
+  return deletedDoc;
 }

@@ -1,3 +1,11 @@
 .button-format {
   margin: 5px;
 }
+
+.left-button-container {
+  float: left;
+}
+
+.right-button-container {
+  float: right;
+}

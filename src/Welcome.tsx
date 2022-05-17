@@ -12,7 +12,7 @@ export default function Welcome(props: RouteComponentProps) {
   return (
     <div className="p-5 mb-4 bg-light rounded-3">
       <Container fluid>
-        <h1>React Graph Tutorial</h1>
+        <h1>M365 App</h1>
         <p className="lead">
           This sample app shows how to use the Microsoft Graph API to access a
           user's data from React
