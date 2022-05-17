@@ -122,7 +122,29 @@ export async function searchDocs(
   return matchedDocs.value;
 }
 
-export async function uploadDocument(filename: string, fileToUpload: any) {
+export async function getDoc(
+  authProvider: AuthCodeMSALBrowserAuthenticationProvider,
+  id: string
+): Promise<any> {
+  ensureClient(authProvider);
+
+  // Return the /me API endpoint result as a User object
+  const matchedDoc = await graphClient!
+    .api(
+      `/sites/harshashvingmail.sharepoint.com,eede2fd0-68f0-4988-ba4f-b048cf226b1e,c031d987-e061-4b55-a997-83807c7aa95f/drive/items/${id}`
+    )
+    // Only retrieve the specific fields needed
+    .get();
+
+  return matchedDoc;
+}
+
+export async function uploadDocument(
+  authProvider: AuthCodeMSALBrowserAuthenticationProvider,
+  filename: string,
+  fileToUpload: any
+) {
+  ensureClient(authProvider);
   const uploadURL =
     "/sites/harshashvingmail.sharepoint.com,eede2fd0-68f0-4988-ba4f-b048cf226b1e,c031d987-e061-4b55-a997-83807c7aa95f/drive/root:/" +
     filename +
