@@ -1,6 +1,12 @@
 import { RouteComponentProps, useHistory, useParams } from "react-router-dom";
 import { useAppContext } from "./AppContext";
-import { deleteDoc, getDoc, getDocVersions, updateDoc } from "./GraphService";
+import {
+  deleteDoc,
+  getDoc,
+  getDocVersions,
+  searchSites,
+  updateDoc,
+} from "./GraphService";
 import { useEffect, useState } from "react";
 import { Button, Table, Form, Alert } from "react-bootstrap";
 import "./DocumentDetail.css";
@@ -8,36 +14,45 @@ import "./DocumentDetail.css";
 export default function DocumentDetail(props: RouteComponentProps) {
   const app = useAppContext();
   const history = useHistory();
-  const { id } = useParams<{ id: string }>();
+  const { id, siteName } = useParams<{ id: string; siteName: string }>();
   const [fileDetail, setFileDetail] = useState<any>();
   const [name, setName] = useState<string>(fileDetail?.name);
   const [show, setShow] = useState<boolean>(false);
   const [fileVersions, setFileVersions] = useState<any>();
   const [refetchVersions, setRefetchVersions] = useState<boolean>(true);
+  const [siteId, setSiteId] = useState<string>("");
   const downloadUrl = fileDetail?.["@microsoft.graph.downloadUrl"];
 
   useEffect(() => {
+    const getSiteDetails = async () => {
+      const siteDetails = await searchSites(app.authProvider!, siteName);
+      setSiteId(siteDetails[0].id);
+    };
+    getSiteDetails();
+  }, [app.authProvider, siteName]);
+
+  useEffect(() => {
     const getDocDetail = async () => {
-      const doc = await getDoc(app.authProvider!, id);
+      const doc = await getDoc(app.authProvider!, siteId, id);
       setFileDetail(doc);
     };
     const getDocVers = async () => {
-      const docVers = await getDocVersions(app.authProvider!, id);
+      const docVers = await getDocVersions(app.authProvider!, siteId, id);
       setFileVersions(docVers);
       setRefetchVersions(false);
     };
-    if (id) {
+    if (id && siteId) {
       getDocDetail();
       getDocVers();
     }
-  }, [app.authProvider, id, refetchVersions]);
+  }, [app.authProvider, id, refetchVersions, siteId]);
 
   useEffect(() => {
     setName(fileDetail?.name);
   }, [fileDetail]);
 
   const modifyDoc = async () => {
-    const doc = await updateDoc(app.authProvider!, id, { name: name });
+    const doc = await updateDoc(app.authProvider!, siteId, id, { name: name });
     if (doc?.id) {
       setShow(true);
       setRefetchVersions(true);
@@ -45,11 +60,11 @@ export default function DocumentDetail(props: RouteComponentProps) {
   };
 
   const deleteFile = async () => {
-    await deleteDoc(app.authProvider!, id);
+    await deleteDoc(app.authProvider!, siteId, id);
     history.push("/docs");
   };
 
-  return (
+  return siteId !== "" ? (
     <div className="p-5 mb-4 bg-light rounded-3">
       <Alert
         show={show}
@@ -157,5 +172,7 @@ export default function DocumentDetail(props: RouteComponentProps) {
         )}
       </div>
     </div>
+  ) : (
+    <></>
   );
 }

@@ -12,6 +12,7 @@ import Calendar from "./Calendar";
 import NewEvent from "./NewEvent";
 import Documents from "./Documents";
 import DocumentDetail from "./DocumentDetail";
+import Sites from "./Sites";
 
 type AppProps = {
   pca: IPublicClientApplication;
@@ -43,13 +44,18 @@ export default function App({ pca }: AppProps) {
               />
               <Route
                 exact
-                path="/docs"
+                path="/sites/:siteName/docs"
                 render={(props) => <Documents {...props} />}
               />
               <Route
                 exact
-                path="/docs/:id"
+                path="/sites/:siteName/docs/:id"
                 render={(props) => <DocumentDetail {...props} />}
+              />
+              <Route
+                exact
+                path="/sites"
+                render={(props) => <Sites {...props} />}
               />
             </Container>
           </div>

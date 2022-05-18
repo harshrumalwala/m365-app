@@ -1,20 +1,30 @@
-import { Link, RouteComponentProps } from "react-router-dom";
+import { Link, RouteComponentProps, useParams } from "react-router-dom";
 import { useAppContext } from "./AppContext";
-import { AsyncTypeahead, Input, Menu } from "react-bootstrap-typeahead";
-import { searchDocs, uploadDocument } from "./GraphService";
-import { useState } from "react";
+import { AsyncTypeahead, Menu } from "react-bootstrap-typeahead";
+import { searchDocs, searchSites, uploadDocument } from "./GraphService";
+import { useEffect, useState } from "react";
 import "./Documents.css";
 import { Alert, Button, Form } from "react-bootstrap";
 
 export default function Documents(props: RouteComponentProps) {
+  const { siteName } = useParams<{ siteName: string }>();
   const app = useAppContext();
   const [matchedDocs, setMatchedDocs] = useState<Array<any>>([]);
   const [show, setShow] = useState<boolean>(false);
+  const [siteId, setSiteId] = useState<string>("");
   const [fileDetails, setFileDetails] = useState<{
     name: string;
     type: string;
     lastModifiedDate: Date;
   }>();
+
+  useEffect(() => {
+    const getSiteDetails = async () => {
+      const siteDetails = await searchSites(app.authProvider!, siteName);
+      setSiteId(siteDetails[0].id);
+    };
+    getSiteDetails();
+  }, [app.authProvider, siteName]);
 
   const fileUpload = () => {
     const filename = fileDetails?.name;
@@ -22,6 +32,7 @@ export default function Documents(props: RouteComponentProps) {
     filereader.onload = async (event) => {
       const resp = await uploadDocument(
         app.authProvider!,
+        siteId,
         filename as string,
         fileDetails
       );
@@ -30,7 +41,7 @@ export default function Documents(props: RouteComponentProps) {
     filereader.readAsArrayBuffer(fileDetails as unknown as Blob);
   };
 
-  return (
+  return siteId !== "" ? (
     <div className="p-5 mb-4 bg-light rounded-3">
       <Alert
         show={show}
@@ -45,7 +56,7 @@ export default function Documents(props: RouteComponentProps) {
         placeholder="Search in Sharepoint"
         filterBy={() => true}
         onSearch={async (query) => {
-          const docs = await searchDocs(app.authProvider!, query);
+          const docs = await searchDocs(app.authProvider!, siteId, query);
           setMatchedDocs(docs);
         }}
         options={matchedDocs}
@@ -53,7 +64,9 @@ export default function Documents(props: RouteComponentProps) {
           <Menu {...menuProps}>
             {results.map((option: any) => (
               <div className="select-item">
-                <Link to={`/docs/${option.id}`}>{option.name}</Link>
+                <Link to={`/sites/${siteName}/docs/${option.id}`}>
+                  {option.name}
+                </Link>
               </div>
             ))}
           </Menu>
@@ -74,5 +87,7 @@ export default function Documents(props: RouteComponentProps) {
         </div>
       </div>
     </div>
+  ) : (
+    <></>
   );
 }

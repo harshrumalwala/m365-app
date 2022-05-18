@@ -62,8 +62,8 @@ export default function NavBar() {
             </AuthenticatedTemplate>
             <AuthenticatedTemplate>
               <NavItem>
-                <RouterNavLink to="/docs" className="nav-link" exact>
-                  Documents
+                <RouterNavLink to="/sites" className="nav-link" exact>
+                  Sites
                 </RouterNavLink>
               </NavItem>
             </AuthenticatedTemplate>

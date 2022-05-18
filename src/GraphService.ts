@@ -107,14 +107,13 @@ export async function createEvent(
 
 export async function searchDocs(
   authProvider: AuthCodeMSALBrowserAuthenticationProvider,
+  siteId: string,
   query: string
 ): Promise<any> {
   ensureClient(authProvider);
 
   const matchedDocs = await graphClient!
-    .api(
-      `/sites/harshashvingmail.sharepoint.com,eede2fd0-68f0-4988-ba4f-b048cf226b1e,c031d987-e061-4b55-a997-83807c7aa95f/drive/root/search(q='${query}')`
-    )
+    .api(`/sites/${siteId}/drive/root/search(q='${query}')`)
     .get();
 
   return matchedDocs.value;
@@ -122,14 +121,13 @@ export async function searchDocs(
 
 export async function getDoc(
   authProvider: AuthCodeMSALBrowserAuthenticationProvider,
+  siteId: string,
   id: string
 ): Promise<any> {
   ensureClient(authProvider);
 
   const matchedDoc = await graphClient!
-    .api(
-      `/sites/harshashvingmail.sharepoint.com,eede2fd0-68f0-4988-ba4f-b048cf226b1e,c031d987-e061-4b55-a997-83807c7aa95f/drive/items/${id}`
-    )
+    .api(`/sites/${siteId}/drive/items/${id}`)
     .get();
 
   return matchedDoc;
@@ -137,14 +135,13 @@ export async function getDoc(
 
 export async function getDocVersions(
   authProvider: AuthCodeMSALBrowserAuthenticationProvider,
+  siteId: string,
   id: string
 ): Promise<any> {
   ensureClient(authProvider);
 
   const docVersions = await graphClient!
-    .api(
-      `/sites/harshashvingmail.sharepoint.com,eede2fd0-68f0-4988-ba4f-b048cf226b1e,c031d987-e061-4b55-a997-83807c7aa95f/drive/items/${id}/versions`
-    )
+    .api(`/sites/${siteId}/drive/items/${id}/versions`)
     .get();
 
   return docVersions.value;
@@ -152,14 +149,12 @@ export async function getDocVersions(
 
 export async function uploadDocument(
   authProvider: AuthCodeMSALBrowserAuthenticationProvider,
+  siteId: string,
   filename: string,
   fileToUpload: any
 ) {
   ensureClient(authProvider);
-  const uploadURL =
-    "/sites/harshashvingmail.sharepoint.com,eede2fd0-68f0-4988-ba4f-b048cf226b1e,c031d987-e061-4b55-a997-83807c7aa95f/drive/root:/" +
-    filename +
-    ":/content";
+  const uploadURL = `/sites/${siteId}/drive/root:/${filename}:/content`;
   const response = await graphClient!.api(uploadURL).put(fileToUpload);
   return response;
 }
@@ -167,13 +162,12 @@ export async function uploadDocument(
 export async function updateDoc(
   authProvider: AuthCodeMSALBrowserAuthenticationProvider,
   id: string,
+  siteId: string,
   body: any
 ): Promise<any> {
   ensureClient(authProvider);
   const updatedDoc = await graphClient!
-    .api(
-      `/sites/harshashvingmail.sharepoint.com,eede2fd0-68f0-4988-ba4f-b048cf226b1e,c031d987-e061-4b55-a997-83807c7aa95f/drive/items/${id}`
-    )
+    .api(`/sites/${siteId}/drive/items/${id}`)
     .update(body);
 
   return updatedDoc;
@@ -181,14 +175,40 @@ export async function updateDoc(
 
 export async function deleteDoc(
   authProvider: AuthCodeMSALBrowserAuthenticationProvider,
+  siteId: string,
   id: string
 ): Promise<any> {
   ensureClient(authProvider);
   const deletedDoc = await graphClient!
-    .api(
-      `/sites/harshashvingmail.sharepoint.com,eede2fd0-68f0-4988-ba4f-b048cf226b1e,c031d987-e061-4b55-a997-83807c7aa95f/drive/items/${id}`
-    )
+    .api(`/sites/${siteId}/drive/items/${id}`)
     .delete();
 
   return deletedDoc;
+}
+
+export async function searchSites(
+  authProvider: AuthCodeMSALBrowserAuthenticationProvider,
+  query: string
+): Promise<any> {
+  ensureClient(authProvider);
+  const matchedSites = await graphClient!.api(`/sites?search=${query}`).get();
+  return matchedSites.value;
+}
+
+export async function createGroup(
+  authProvider: AuthCodeMSALBrowserAuthenticationProvider,
+  displayName: string,
+  description: string,
+  mailNickName: string
+): Promise<any> {
+  ensureClient(authProvider);
+  const newGroup = await graphClient!.api("/groups").post({
+    displayName: displayName,
+    description: description,
+    groupTypes: ["Unified"],
+    mailEnabled: true,
+    mailNickname: mailNickName,
+    securityEnabled: false,
+  });
+  return newGroup;
 }
