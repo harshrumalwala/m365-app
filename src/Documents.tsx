@@ -43,6 +43,7 @@ export default function Documents(props: RouteComponentProps) {
 
   return siteId !== "" ? (
     <div className="p-5 mb-4 bg-light rounded-3">
+      <h3>{siteName}</h3>
       <Alert
         show={show}
         variant="success"
