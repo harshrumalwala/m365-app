@@ -4,7 +4,9 @@ import {
   deleteDoc,
   getDoc,
   getDocVersions,
+  getListItem,
   searchSites,
+  updateColumn,
   updateDoc,
 } from "./GraphService";
 import { useEffect, useState } from "react";
@@ -14,13 +16,19 @@ import "./DocumentDetail.css";
 export default function DocumentDetail(props: RouteComponentProps) {
   const app = useAppContext();
   const history = useHistory();
-  const { id, siteName } = useParams<{ id: string; siteName: string }>();
+  const { listItemId, siteName, listId, driveItemId } = useParams<{
+    listItemId: string;
+    siteName: string;
+    listId: string;
+    driveItemId: string;
+  }>();
   const [fileDetail, setFileDetail] = useState<any>();
   const [name, setName] = useState<string>(fileDetail?.name);
   const [show, setShow] = useState<boolean>(false);
   const [fileVersions, setFileVersions] = useState<any>();
   const [refetchVersions, setRefetchVersions] = useState<boolean>(true);
   const [siteId, setSiteId] = useState<string>("");
+  const [fields, setFields] = useState<any>({});
   const downloadUrl = fileDetail?.["@microsoft.graph.downloadUrl"];
 
   useEffect(() => {
@@ -31,39 +39,74 @@ export default function DocumentDetail(props: RouteComponentProps) {
     getSiteDetails();
   }, [app.authProvider, siteName]);
 
+  const getDocDetail = async () => {
+    const doc = await getListItem(
+      app.authProvider!,
+      siteId,
+      listId,
+      listItemId
+    );
+    setFileDetail(doc);
+  };
+
   useEffect(() => {
-    const getDocDetail = async () => {
-      const doc = await getDoc(app.authProvider!, siteId, id);
-      setFileDetail(doc);
-    };
     const getDocVers = async () => {
-      const docVers = await getDocVersions(app.authProvider!, siteId, id);
+      const docVers = await getDocVersions(
+        app.authProvider!,
+        siteId,
+        listId,
+        driveItemId
+      );
       setFileVersions(docVers);
       setRefetchVersions(false);
     };
-    if (id && siteId) {
+    if (listItemId && siteId) {
       getDocDetail();
       getDocVers();
     }
-  }, [app.authProvider, id, refetchVersions, siteId]);
+  }, [
+    app.authProvider,
+    listItemId,
+    listId,
+    refetchVersions,
+    siteId,
+    driveItemId,
+  ]);
 
   useEffect(() => {
     setName(fileDetail?.name);
   }, [fileDetail]);
 
   const modifyDoc = async () => {
-    const doc = await updateDoc(app.authProvider!, siteId, id, { name: name });
+    const doc = await updateDoc(app.authProvider!, siteId, listItemId, {
+      name: name,
+    });
     if (doc?.id) {
       setShow(true);
       setRefetchVersions(true);
     }
   };
 
-  const deleteFile = async () => {
-    await deleteDoc(app.authProvider!, siteId, id);
-    history.push("/docs");
+  const updateCol = async () => {
+    const doc = await updateColumn(
+      app.authProvider!,
+      siteId,
+      listId,
+      listItemId,
+      fields
+    );
+    if (doc) {
+      getDocDetail();
+      setShow(true);
+      setRefetchVersions(true);
+    }
   };
 
+  const deleteFile = async () => {
+    await deleteDoc(app.authProvider!, siteId, listItemId);
+    history.push(`/sites/${siteName}/lists/${listId}/docs`);
+  };
+  console.log("fields", fields);
   return siteId !== "" ? (
     <div className="p-5 mb-4 bg-light rounded-3">
       <Alert
@@ -98,7 +141,7 @@ export default function DocumentDetail(props: RouteComponentProps) {
                 </Button>
               </div>
               <div className="right-button-container">
-                <Button className="button-format" onClick={modifyDoc}>
+                <Button className="button-format" onClick={updateCol}>
                   Update
                 </Button>
                 <Button
@@ -110,13 +153,21 @@ export default function DocumentDetail(props: RouteComponentProps) {
                 </Button>
               </div>
             </div>
-            <Form.Group className="mb-3">
-              <Form.Label>File Name</Form.Label>
-              <Form.Control
-                value={name}
-                onChange={(e: any) => setName(e.target.value)}
-              />
-            </Form.Group>
+            {Object.entries(fileDetail.fields).map(
+              (k: any) =>
+                !k[0].includes("_") &&
+                !k[0].includes("@") && (
+                  <Form.Group className="mb-3">
+                    <Form.Label>{k[0]}</Form.Label>
+                    <Form.Control
+                      value={k[0] in fields ? fields[k[0]] : k[1]}
+                      onChange={(e: any) =>
+                        setFields({ ...fields, [k[0]]: e.target.value })
+                      }
+                    />
+                  </Form.Group>
+                )
+            )}
             <Form.Group className="mb-3">
               <Form.Label>Created By</Form.Label>
               <Form.Control

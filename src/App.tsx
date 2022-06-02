@@ -13,6 +13,7 @@ import NewEvent from "./NewEvent";
 import Documents from "./Documents";
 import DocumentDetail from "./DocumentDetail";
 import Sites from "./Sites";
+import Lists from "./Lists";
 
 type AppProps = {
   pca: IPublicClientApplication;
@@ -44,18 +45,23 @@ export default function App({ pca }: AppProps) {
               />
               <Route
                 exact
-                path="/sites/:siteName/docs"
+                path="/sites/:siteName/lists/:listId/docs"
                 render={(props) => <Documents {...props} />}
               />
               <Route
                 exact
-                path="/sites/:siteName/docs/:id"
+                path="/sites/:siteName/lists/:listId/docs/:driveItemId/:listItemId"
                 render={(props) => <DocumentDetail {...props} />}
               />
               <Route
                 exact
                 path="/sites"
                 render={(props) => <Sites {...props} />}
+              />
+              <Route
+                exact
+                path="/sites/:siteName/lists/"
+                render={(props) => <Lists {...props} />}
               />
             </Container>
           </div>

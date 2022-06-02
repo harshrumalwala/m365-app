@@ -80,7 +80,12 @@ export default function Sites(props: RouteComponentProps) {
           </Form.Group>
         </Col>
         <Col>
-          <Button onClick={createNewGroup}>Create M365 Group</Button>
+          <Button
+            disabled={name === "" || nickName === "" || description === ""}
+            onClick={createNewGroup}
+          >
+            Create M365 Group
+          </Button>
         </Col>
       </Row>
       <Row xs={1} md={4} sm={2} className="g-4">
@@ -90,7 +95,7 @@ export default function Sites(props: RouteComponentProps) {
               <Card.Header>{site.displayName}</Card.Header>
               <Card.Body>
                 <Card.Text>{site.description}</Card.Text>
-                <Link to={`/sites/${site.displayName}/docs`}>Documents</Link>
+                <Link to={`/sites/${site.displayName}/lists`}>Site Lists</Link>
               </Card.Body>
             </Card>
           </Col>

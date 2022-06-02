@@ -136,12 +136,13 @@ export async function getDoc(
 export async function getDocVersions(
   authProvider: AuthCodeMSALBrowserAuthenticationProvider,
   siteId: string,
+  listId: string,
   id: string
 ): Promise<any> {
   ensureClient(authProvider);
 
   const docVersions = await graphClient!
-    .api(`/sites/${siteId}/drive/items/${id}/versions`)
+    .api(`/sites/${siteId}/lists/${listId}/drive/items/${id}/versions`)
     .get();
 
   return docVersions.value;
@@ -150,11 +151,12 @@ export async function getDocVersions(
 export async function uploadDocument(
   authProvider: AuthCodeMSALBrowserAuthenticationProvider,
   siteId: string,
+  listId: string,
   filename: string,
   fileToUpload: any
 ) {
   ensureClient(authProvider);
-  const uploadURL = `/sites/${siteId}/drive/root:/${filename}:/content`;
+  const uploadURL = `/sites/${siteId}/lists/${listId}/drive/root:/${filename}:/content`;
   const response = await graphClient!.api(uploadURL).put(fileToUpload);
   return response;
 }
@@ -211,4 +213,97 @@ export async function createGroup(
     securityEnabled: false,
   });
   return newGroup;
+}
+
+export async function getListItem(
+  authProvider: AuthCodeMSALBrowserAuthenticationProvider,
+  siteId: string,
+  listId: string,
+  itemId: string
+): Promise<any> {
+  ensureClient(authProvider);
+  const item = await graphClient!
+    .api(`/sites/${siteId}/lists/${listId}/items/${itemId}`)
+    .get();
+  return item;
+}
+
+export async function getAllLists(
+  authProvider: AuthCodeMSALBrowserAuthenticationProvider,
+  siteId: string
+): Promise<any> {
+  ensureClient(authProvider);
+  const lists = await graphClient!.api(`/sites/${siteId}/lists/`).get();
+  return lists.value;
+}
+
+export async function searchDriveItem(
+  authProvider: AuthCodeMSALBrowserAuthenticationProvider,
+  query: string,
+  listId: string
+): Promise<any> {
+  ensureClient(authProvider);
+  const lists = await graphClient!.api(`/search/query`).post({
+    requests: [
+      {
+        entityTypes: ["driveItem"],
+        query: {
+          queryString: query,
+        },
+      },
+    ],
+  });
+  const hits = lists.value?.[0]?.hitsContainers?.[0]?.hits;
+  return hits.filter(
+    (r: any) => r?.resource?.parentReference?.sharepointIds?.listId === listId
+  );
+}
+
+export async function updateColumn(
+  authProvider: AuthCodeMSALBrowserAuthenticationProvider,
+  siteId: string,
+  listId: string,
+  itemId: string,
+  fields: any
+): Promise<any> {
+  ensureClient(authProvider);
+  const item = await graphClient!
+    .api(`/sites/${siteId}/lists/${listId}/items/${itemId}/fields`)
+    .update(fields);
+  return item;
+}
+
+export async function getAllColumns(
+  authProvider: AuthCodeMSALBrowserAuthenticationProvider,
+  siteId: string,
+  listId: string
+): Promise<any> {
+  ensureClient(authProvider);
+  const cols = await graphClient!
+    .api(`/sites/${siteId}/lists/${listId}/columns`)
+    .get();
+  return cols.value;
+}
+
+export async function createColumn(
+  authProvider: AuthCodeMSALBrowserAuthenticationProvider,
+  siteId: string,
+  listId: string,
+  body: any
+): Promise<any> {
+  ensureClient(authProvider);
+  const item = await graphClient!
+    .api(`/sites/${siteId}/lists/${listId}/columns`)
+    .post(body);
+  return item;
+}
+
+export async function createList(
+  authProvider: AuthCodeMSALBrowserAuthenticationProvider,
+  siteId: string,
+  body: any
+): Promise<any> {
+  ensureClient(authProvider);
+  const list = await graphClient!.api(`/sites/${siteId}/lists`).post(body);
+  return list;
 }
